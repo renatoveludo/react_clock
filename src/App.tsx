@@ -88,6 +88,7 @@ export class App extends React.Component<{}, State> {
   };
 
   handleClick = () => {
+    this.setState({ hasClock: true });
     this.setState(
       prevState => ({
         hasClock: true,
