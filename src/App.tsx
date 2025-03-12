@@ -17,6 +17,7 @@ type State = {
   hasClock: boolean;
   today: Date;
   prevClockName: string;
+  count: boolean;
 };
 
 export class App extends React.Component<{}, State> {
@@ -29,15 +30,19 @@ export class App extends React.Component<{}, State> {
     hasClock: true,
     today: new Date(),
     prevClockName: 'Clock-0',
+    count: false,
   };
 
   componentDidMount() {
     this.clockNameTimerId = window.setInterval(() => {
       if (this.state.hasClock) {
-        this.setState(prevState => ({
-          prevClockName: prevState.clockName, // Garante que o antigo nome seja salvo corretamente AQUI
+        this.setState(() => ({
+          prevClockName: this.state.clockName,
           clockName: getRandomName(),
+          count: true,
         }));
+        // eslint-disable-next-line no-console
+        console.log(this.state.prevClockName, this.state.clockName, '3.3s');
       }
     }, 3300);
 
@@ -49,7 +54,7 @@ export class App extends React.Component<{}, State> {
           // eslint-disable-next-line no-console
           console.log(getCurrentTime());
         });
-        this.setState({ prevClockName: this.state.clockName });
+        //this.setState({ prevClockName: this.state.clockName });
       }
     }, 1000);
 
@@ -58,10 +63,8 @@ export class App extends React.Component<{}, State> {
   }
 
   componentDidUpdate() {
-    if (
-      this.state.prevClockName !== this.state.clockName &&
-      this.state.hasClock !== false
-    ) {
+    if (this.state.count === true && this.state.hasClock !== false) {
+      this.setState({ count: false });
       // eslint-disable-next-line no-console
       console.warn(
         `Renamed from ${this.state.prevClockName} to ${this.state.clockName}`,
@@ -70,6 +73,9 @@ export class App extends React.Component<{}, State> {
   }
 
   componentWillUnmount() {
+    // eslint-disable-next-line no-console
+    console.log('Component will unmount');
+
     if (this.clockNameTimerId) {
       window.clearInterval(this.clockNameTimerId);
     }
@@ -88,17 +94,12 @@ export class App extends React.Component<{}, State> {
   };
 
   handleClick = () => {
-    this.setState({ hasClock: true });
     this.setState(
-      prevState => ({
+      () => ({
         hasClock: true,
-        prevClockName: prevState.clockName,
-        clockName: getRandomName(),
         today: new Date(),
       }),
       () => {
-        setTimeout(() => this.forceUpdate(), 0);
-
         this.timerId = window.setInterval(() => {
           const now = new Date();
 
@@ -115,7 +116,11 @@ export class App extends React.Component<{}, State> {
       <div className="App">
         <h1>React clock</h1>
         {hasClock && (
-          <Clock name={clockName} time={today.toUTCString().slice(-12, -4)} />
+          <Clock
+            name={clockName}
+            key="clock"
+            time={today.toUTCString().slice(-12, -4)}
+          />
         )}
       </div>
     );
