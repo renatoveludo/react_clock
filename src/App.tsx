@@ -98,6 +98,7 @@ export class App extends React.Component<{}, State> {
       () => ({
         hasClock: true,
         today: new Date(),
+        clockName: 'Clock-4900',
       }),
       () => {
         this.timerId = window.setInterval(() => {
